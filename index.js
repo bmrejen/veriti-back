@@ -7,8 +7,12 @@ const PORT = 3002;
 app.use(cors());
 
 app.get("/v1/vulnerabilities", async (req, res) => {
-  const vulnerabilities = await getVulnerabilities();
-  res.send({ vulnerabilities });
+  try {
+    const vulnerabilities = await getVulnerabilities();
+    res.send({ vulnerabilities });
+  } catch (err) {
+    res.status(500).send({ error: err });
+  }
 });
 
 app.listen(PORT, () => {
