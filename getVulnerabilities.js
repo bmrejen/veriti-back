@@ -32,17 +32,20 @@ function mergeMachines(arr) {
 }
 
 async function getRelatedIps(res) {
+  if (!res.value) throw new Error("No value in response. Try again later");
   // {machineId, cveId}
   const affectedMachines = getAffectedMachineIds(res);
   const mergedMachines = mergeMachines(affectedMachines);
 
   const allMachines = await getMachines();
+  const result = [];
 
   for (const affectedMachine of affectedMachines) {
     const machine = allMachines.find((machine) => machine.id === affectedMachine.machineId);
     mergedMachines[affectedMachine.machineId].ip = machine.lastIpAddress;
+    result.push({ ...mergedMachines[affectedMachine.machineId] });
   }
-  return mergedMachines;
+  return result;
 }
 
 async function getMachines() {
@@ -63,6 +66,7 @@ async function getMachines() {
 }
 
 function getAffectedMachineIds(res) {
+  console.log("res:", res);
   const { value } = res;
   const machines = [...new Set(value.map(({ machineId, cveId }) => ({ machineId, cveId })))];
   return machines;
